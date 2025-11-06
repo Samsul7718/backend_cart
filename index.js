@@ -1,6 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import products from './product/'
+import products from './product.js';
 
 dotenv.config();
 
@@ -11,6 +11,10 @@ const app=express();
 
 app.get('/',(req,res)=>{
     res.send('Server is ready to serve')
+})
+
+app.get('/api/products',(req,res)=>{
+    res.json(products);
 })
 
 app.listen(port,()=>{
