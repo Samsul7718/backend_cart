@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import products from './product.js';
 import cors from 'cors';
+import razorpay from 'razorpay';
 
 const app=express();
 app.use(cors({
@@ -25,6 +26,10 @@ app.get('/',(req,res)=>{
 
 app.get('/api/products',(req,res)=>{
     res.json(products);
+})
+
+app.post('/order',(req,res)=>{
+    
 })
 
 app.listen(port,()=>{
