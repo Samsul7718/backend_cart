@@ -1,4 +1,5 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import products from './product.js';
 import cors from 'cors';
@@ -18,6 +19,11 @@ app.use(cors({
   credentials: true
 }));
 dotenv.config();
+
+// Connect to MongoDB
+mongoose.connect(process.env.MONGODB_URI)
+.then(()=>console.log("✅ MongoDB connected"))
+.catch(err=>console.log("❌ MongoDB connection error:", err));
 
 const port=process.env.PORT || 3000;
 
@@ -40,6 +46,7 @@ app.post('/order', async (req, res) => {
   if(!order){
     return res.status(500).send("Some error occured");
   }
+
 
   res.json(order);
    } catch (error) {
