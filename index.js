@@ -5,6 +5,7 @@ import products from './product.js';
 import cors from 'cors';
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
+import Orders from './models/Orders.js'; 
 
 const app=express();
 app.use(express.json());
