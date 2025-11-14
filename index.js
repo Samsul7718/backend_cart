@@ -48,7 +48,6 @@ app.post('/order', async (req, res) => {
     return res.status(500).send("Some error occured");
   }
 
-
   res.json(order);
    } catch (error) {
         res.status(500).send("Server error" + error);
