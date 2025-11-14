@@ -5,7 +5,8 @@ import products from './product.js';
 import cors from 'cors';
 import Razorpay from 'razorpay';
 import crypto from 'crypto';
-import Orders from './models/Orders.js'; 
+// import { mongo } from 'mongoose';
+import collection from './models/Orders.js'; 
 
 const app=express();
 app.use(express.json());
@@ -42,11 +43,24 @@ app.post('/order', async (req, res) => {
     key_id:process.env.RAZORPAY_KEY_ID,
     key_secret:process.env.RAZORPAY_KEY_SECRET
   })
-  const options=req.body;
+    const options = {
+        amount: req.body.amount * 100,       // convert rupees → paise
+        currency: "INR",
+        receipt: `receipt_${Date.now()}`
+        };
   const order=await razorpay.orders.create(options);
   if(!order){
     return res.status(500).send("Some error occured");
   }
+//   save order to database
+  const newOrder=await collection.create({
+    orderId:order.id,
+    amount:req.body.amount,
+    currency:"INR",
+    cartItems: req.body.cartItems,
+    status:"created",
+  });
+     console.log("🟢 Order saved to DB:", newOrder._id);
 
   res.json(order);
    } catch (error) {
@@ -63,6 +77,19 @@ app.post('/order/validate',async(req,res)=>{
     if(digest !== razorpay_signature){
         return res.status(400).send("Invalid transaction signature");
     }
+      // 2️⃣ Update order in DB after payment success
+  const updatedOrder = await collection.findOneAndUpdate(
+    { orderId: razorpay_order_id },
+    {
+      paymentId: razorpay_payment_id,
+      signature: razorpay_signature,
+      status: "paid"
+    },
+    { new: true }
+  );
+
+  console.log("🟢 Payment verified & order updated:", updatedOrder);
+
     res.json({
         msg:"success",
         orderId:razorpay_order_id,
@@ -70,6 +97,7 @@ app.post('/order/validate',async(req,res)=>{
     })
   
 })
+
 
 app.listen(port,()=>{
     console.log(`Server is running on port ${port}`);
