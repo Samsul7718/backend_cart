@@ -60,7 +60,7 @@ app.post('/order', async (req, res) => {
     cartItems: req.body.cartItems,
     status:"created",
   });
-     console.log("🟢 Order saved to DB:", newOrder._id);
+  console.log("🟢 Order saved to DB:", newOrder._id)
 
   res.json(order);
    } catch (error) {
@@ -75,9 +75,10 @@ app.post('/order/validate',async(req,res)=>{
     sha.update(`${razorpay_order_id}|${razorpay_payment_id}`);
     const digest=sha.digest('hex');
     if(digest !== razorpay_signature){
+        console.log("🔴 Signature mismatch!");
         return res.status(400).send("Invalid transaction signature");
     }
-      // 2️⃣ Update order in DB after payment success
+      // Update order in DB after payment success
   const updatedOrder = await collection.findOneAndUpdate(
     { orderId: razorpay_order_id },
     {
@@ -85,13 +86,13 @@ app.post('/order/validate',async(req,res)=>{
       signature: razorpay_signature,
       status: "paid"
     },
-    { new: true }
+    { new: true },
   );
-
   console.log("🟢 Payment verified & order updated:", updatedOrder);
 
     res.json({
         msg:"success",
+        updatedOrder:updatedOrder,
         orderId:razorpay_order_id,
         paymentId:razorpay_payment_id
     })
