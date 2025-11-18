@@ -92,7 +92,7 @@ app.post('/order/validate',async(req,res)=>{
 
     res.json({
         msg:"success",
-        updatedOrder:updatedOrder,
+         updatedOrder: updatedOrder ? updatedOrder.toObject() : null,
         orderId:razorpay_order_id,
         paymentId:razorpay_payment_id
     })
